@@ -212,8 +212,8 @@ if (NOT WIN32)
       triton-tensorrt-backend
     EXPORT
       triton-tensorrt-backend-targets
-    LIBRARY DESTINATION ${TRITON_TENSORRT_BACKEND_INSTALLDIR}
-    ARCHIVE DESTINATION ${TRITON_TENSORRT_BACKEND_INSTALLDIR}
+      LIBRARY DESTINATION ${TRITON_TENSORRT_BACKEND_INSTALLDIR} COMPONENT backend
+      ARCHIVE DESTINATION ${TRITON_TENSORRT_BACKEND_INSTALLDIR} COMPONENT backend
   )
 else()
   install(
@@ -235,6 +235,8 @@ install(
     TritonTensorRTBackend::
   DESTINATION
     ${INSTALL_CONFIGDIR}
+  COMPONENT
+    backend-config
 )
 
 include(CMakePackageConfigHelpers)
@@ -248,6 +250,8 @@ install(
   FILES
     ${CMAKE_CURRENT_BINARY_DIR}/TritonTensorRTBackendConfig.cmake
   DESTINATION ${INSTALL_CONFIGDIR}
+  COMPONENT 
+    backend-config
 )
 
 #
@@ -260,3 +264,26 @@ export(
 )
 
 export(PACKAGE TritonTensorRTBackend)
+
+
+#
+# CPack settings
+#
+set(TRITON_VERSION "2.11.0")
+set(CPACK_GENERATOR "RPM")
+set(CPACK_SET_DESTDIR OFF)
+string(STRIP "${CMAKE_SYSTEM_PROCESSOR}" CPACK_RPM_PACKAGE_ARCHITECTURE)
+set(CPACK_PACKAGE_NAME "Triton TensorRT Backend")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "NVIDIA Triton TensorRT backend.")
+set(CPACK_PACKAGE_DESCRIPTION "Native binaries for the NVIDIA Triton TensorRT backend.")
+set(CPACK_PACKAGE_VENDOR "NVIDIA CORPORATION")
+set(CPACK_PACKAGE_VERSION "${TRITON_VERSION}")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_RPM_PACKAGE_ARCHITECTURE}")
+set(CPACK_RPM_COMPONENT_INSTALL ON)
+set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+set(CPACK_RPM_PACKAGE_URL "https://github.com/triton-inference-server/tensorrt_backend")
+set(CPACK_RPM_PACKAGE_AUTOPROV ON)
+set(CPACK_RPM_PACKAGE_AUTOREQ OFF)
+set(CPACK_RPM_MAIN_COMPONENT backend)
+set(CPACK_COMPONENTS_ALL backend backend-config)
+include(CPack) 
